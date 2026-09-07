@@ -1,0 +1,204 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="description" content="A deterministic, explainable AI governance policy-as-code demonstrator from TFx Holdings." />
+  <title>TFx AI Governance Policy Engine</title>
+  <meta name="theme-color" content="#071c32" />
+  <link rel="icon" type="image/png" sizes="32x32" href="./assets/favicon-32.png" />
+  <link rel="icon" type="image/png" sizes="64x64" href="./assets/favicon-64.png" />
+  <link rel="apple-touch-icon" sizes="180x180" href="./assets/apple-touch-icon.png" />
+  <link rel="manifest" href="./site.webmanifest" />
+  <link rel="stylesheet" href="./styles.css" />
+</head>
+<body>
+  <header class="site-header">
+    <div class="brand">
+      <img class="brand-logo" src="./assets/tfx-holdings-logo.png" alt="TFx Holdings Ltd logo" />
+      <div>
+        <div class="brand-name">TFx AI Governance Policy Engine</div>
+        <div class="brand-subtitle">AI Value Realisation · Operating Models · Organisational Intelligence</div>
+      </div>
+    </div>
+    <a class="github-link" href="https://github.com/TFxHoldings/ai-governance-policy-engine" target="_blank" rel="noreferrer">View source</a>
+  </header>
+
+  <main class="shell">
+    <section class="hero">
+      <div class="hero-copy">
+        <div class="eyebrow">TFx HOLDINGS · PUBLIC GOVERNANCE DEMONSTRATOR</div>
+        <h1>Turn an AI use case into an auditable governance decision.</h1>
+        <p>
+          This self-contained web application evaluates an AI use case using deterministic rules,
+          shows exactly which policies fired, and generates a control plan. It does not call an LLM,
+          send data to a server, or make a legal determination.
+        </p>
+      </div>
+      <div class="hero-brand-stack">
+        <img class="hero-logo" src="./assets/tfx-holdings-logo.png" alt="" aria-hidden="true" />
+        <div class="hero-card">
+        <div class="hero-stat"><strong>100%</strong><span>client-side</span></div>
+        <div class="hero-stat"><strong>0</strong><span>external APIs</span></div>
+        <div class="hero-stat"><strong>Explainable</strong><span>rule-by-rule output</span></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="workspace">
+      <form id="assessment-form" class="panel form-panel">
+        <div class="panel-heading">
+          <div>
+            <div class="eyebrow">ASSESSMENT INPUT</div>
+            <h2>Describe the use case</h2>
+          </div>
+          <button class="button secondary" type="button" id="load-example">Load example</button>
+        </div>
+
+        <div class="form-grid">
+          <label class="field field-wide">
+            <span>Use case name</span>
+            <input id="name" name="name" type="text" maxlength="120" required placeholder="e.g. AI-assisted recruitment screening" />
+          </label>
+
+          <label class="field field-wide">
+            <span>Purpose / business context</span>
+            <textarea id="purpose" name="purpose" rows="3" maxlength="500" required placeholder="What does the system do and what decision or workflow does it influence?"></textarea>
+          </label>
+
+          <label class="field">
+            <span>Domain</span>
+            <select id="domain" name="domain">
+              <option value="general">General business</option>
+              <option value="employment">Employment / HR</option>
+              <option value="financial">Financial services</option>
+              <option value="healthcare">Healthcare</option>
+              <option value="education">Education</option>
+              <option value="public-services">Public services</option>
+              <option value="critical-infrastructure">Critical infrastructure</option>
+            </select>
+          </label>
+
+          <label class="field">
+            <span>AI autonomy</span>
+            <select id="autonomy" name="autonomy">
+              <option value="assistive">Assistive — recommends only</option>
+              <option value="supervised">Supervised — acts with human approval</option>
+              <option value="autonomous">Autonomous — can act without approval</option>
+            </select>
+          </label>
+
+          <label class="field">
+            <span>Decision impact</span>
+            <select id="impact" name="impact">
+              <option value="low">Low — convenience / productivity</option>
+              <option value="medium">Medium — material workflow outcome</option>
+              <option value="high">High — rights, access, safety or significant financial outcome</option>
+            </select>
+          </label>
+
+          <label class="field">
+            <span>Users affected</span>
+            <select id="audience" name="audience">
+              <option value="internal">Internal workforce</option>
+              <option value="customers">Customers / public</option>
+              <option value="both">Both</option>
+            </select>
+          </label>
+        </div>
+
+        <fieldset class="check-group">
+          <legend>Risk and control signals</legend>
+          <label class="check"><input type="checkbox" id="personalData" /> Uses personal data</label>
+          <label class="check"><input type="checkbox" id="sensitiveData" /> Uses sensitive / special-category data</label>
+          <label class="check"><input type="checkbox" id="generativeAI" /> Generates content or decisions using generative AI</label>
+          <label class="check"><input type="checkbox" id="humanApproval" /> Human approval is required before material action</label>
+          <label class="check"><input type="checkbox" id="auditLogging" /> Material actions and decisions are logged</label>
+          <label class="check"><input type="checkbox" id="monitoring" /> Post-deployment monitoring is defined</label>
+          <label class="check"><input type="checkbox" id="vendorAssessed" /> Third-party / model vendor has been assessed</label>
+          <label class="check"><input type="checkbox" id="aiDisclosure" /> Users are told when they are interacting with AI where relevant</label>
+        </fieldset>
+
+        <div class="form-actions">
+          <button class="button primary" type="submit">Run governance assessment</button>
+          <button class="button ghost" type="reset">Reset</button>
+        </div>
+      </form>
+
+      <section class="panel result-panel" aria-live="polite">
+        <div id="empty-state" class="empty-state">
+          <div class="empty-icon">◎</div>
+          <h2>No assessment yet</h2>
+          <p>Complete the use-case profile and run the policy engine. All processing happens in your browser.</p>
+        </div>
+
+        <div id="result" class="hidden">
+          <div class="result-header">
+            <div>
+              <div class="eyebrow">GOVERNANCE DECISION</div>
+              <h2 id="result-name">Assessment</h2>
+            </div>
+            <button id="download-report" class="button secondary" type="button">Download JSON report</button>
+          </div>
+
+          <div class="score-card">
+            <div class="score-ring" id="score-ring"><span id="score">0</span></div>
+            <div>
+              <div id="posture" class="posture">—</div>
+              <p id="decision-text"></p>
+            </div>
+          </div>
+
+          <div class="metrics">
+            <div class="metric"><span>Triggered policies</span><strong id="trigger-count">0</strong></div>
+            <div class="metric"><span>Required controls</span><strong id="control-count">0</strong></div>
+            <div class="metric"><span>Blocking conditions</span><strong id="blocker-count">0</strong></div>
+          </div>
+
+          <div class="section-block">
+            <h3>Required controls</h3>
+            <div id="controls" class="chips"></div>
+          </div>
+
+          <div class="section-block">
+            <h3>Policy trace</h3>
+            <div id="policy-trace" class="policy-trace"></div>
+          </div>
+
+          <div class="section-block">
+            <h3>Framework signals</h3>
+            <div id="framework-signals" class="framework-grid"></div>
+          </div>
+        </div>
+      </section>
+    </section>
+
+    <section class="method">
+      <div class="eyebrow">DESIGN PRINCIPLES</div>
+      <h2>Governance decisions should be inspectable.</h2>
+      <div class="principles">
+        <article><h3>Deterministic</h3><p>The same inputs produce the same result. Policy rules are explicit and versionable.</p></article>
+        <article><h3>Explainable</h3><p>Every score change and control requirement is tied to a visible rule.</p></article>
+        <article><h3>Portable</h3><p>Static HTML, CSS and JavaScript. Clone it, host it, fork it, or embed the engine elsewhere.</p></article>
+        <article><h3>Framework-aware</h3><p>Outputs include screening signals aligned to common AI governance concerns, without pretending to replace formal legal or standards assessment.</p></article>
+      </div>
+    </section>
+
+    <section class="disclaimer">
+      <strong>Important:</strong> This project is an educational and portfolio demonstrator. It is not legal advice,
+      certification, conformity assessment, or an automated determination of obligations under the EU AI Act,
+      ISO/IEC 42001, NIST AI RMF, or any other framework.
+    </section>
+  </main>
+
+  <footer>
+    <div class="footer-brand">
+      <img src="./assets/tfx-holdings-logo.png" alt="TFx Holdings Ltd logo" />
+      <span>TFx Holdings · AI Value Realisation · Operating Models · Organisational Intelligence</span>
+    </div>
+    <span>Public open-source demonstrator · MPL-2.0</span>
+  </footer>
+
+  <script type="module" src="./src/app.js"></script>
+</body>
+</html>
